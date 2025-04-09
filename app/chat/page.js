@@ -239,7 +239,7 @@ export default function Chat({ id }) {
       })
 
       try {
-        const uploadResponse = await axios.post("http://localhost:8000/api/upload", formData, {
+        const uploadResponse = await axios.post("https://chat-backend-production-b501.up.railway.app/api/upload", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -259,7 +259,7 @@ export default function Chat({ id }) {
       })
 
       try {
-        const uploadResponse = await axios.post("http://localhost:8000/api/upload-audio", formData, {
+        const uploadResponse = await axios.post("https://chat-backend-production-b501.up.railway.app/api/upload-audio", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -279,7 +279,7 @@ export default function Chat({ id }) {
       })
 
       try {
-        const uploadResponse = await axios.post("http://localhost:8000/api/upload-document", formData, {
+        const uploadResponse = await axios.post("https://chat-backend-production-b501.up.railway.app/api/upload-document", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -401,7 +401,7 @@ export default function Chat({ id }) {
     if (!currentUser || !chatid) return
 
     try {
-      const response = await axios.get("http://localhost:8000/api/messages", {
+      const response = await axios.get("https://chat-backend-production-b501.up.railway.app/api/messages", {
         params: { userId: currentUser.id, chatWithId: chatid },
       })
       setMessages(response.data)
@@ -425,7 +425,7 @@ export default function Chat({ id }) {
 
     const fetchMessages = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/messages", {
+        const response = await axios.get("https://chat-backend-production-b501.up.railway.app/api/messages", {
           params: { userId: currentUser.id, chatWithId: chatid },
         })
         console.log("woooo", response.data)
@@ -519,7 +519,7 @@ export default function Chat({ id }) {
 
     const fetchChatUsers = async () => {
       try {
-        const res = await axios.get(`http://localhost:8000/api/userlistwithchat/${currentUser.id}`)
+        const res = await axios.get(`https://chat-backend-production-b501.up.railway.app/api/userlistwithchat/${currentUser.id}`)
         setChatUsers(res.data)
       } catch (err) {
         console.error("Error fetching chat users:", err)

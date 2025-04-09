@@ -29,7 +29,7 @@ export default function UserList() {
   useEffect(() => {
     setLoading(true)
     axios
-      .get("http://localhost:8000/api/users")
+      .get("https://chat-backend-production-b501.up.railway.app/api/users")
       .then((response) => {
         setUsers(response.data)
         setLoading(false)
@@ -64,7 +64,7 @@ export default function UserList() {
     if (!currentUser) return
 
     try {
-      await axios.post("http://localhost:8000/api/userlistwithchat", {
+      await axios.post("https://chat-backend-production-b501.up.railway.app/api/userlistwithchat", {
         currentUserId: currentUser.id,
         chats: [
           {

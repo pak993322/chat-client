@@ -7,7 +7,7 @@ import axios from "axios"
 import ProtectedRoute from "../components/ProtectedRoute"
 import { ArrowLeftFromLine } from "lucide-react"
 
-const socket = io("http://localhost:8000")
+const socket = io("https://chat-backend-production-b501.up.railway.app")
 
 export default function Chat({ id }) {
   const [message, setMessage] = useState("")

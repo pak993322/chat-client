@@ -7,7 +7,7 @@ import axios from "axios"
 import ProtectedRoute from "../components/ProtectedRoute"
 import { ArrowLeftFromLine } from "lucide-react"
 
-const socket = io("https://chat-backend-production-b501.up.railway.app")
+const socket = io("https://chat-backend-production-b501.up.railway.app");
 
 export default function Chat({ id }) {
   const [message, setMessage] = useState("")
@@ -44,7 +44,7 @@ export default function Chat({ id }) {
   // Add these new state variables at the top with the other state declarations
   const [documentFiles, setDocumentFiles] = useState([])
   const [documentPreviews, setDocumentPreviews] = useState([])
-    const [isSending, setIsSending] = useState(false)
+  const [isSending, setIsSending] = useState(false)
   const documentInputRef = useRef(null)
 
   useEffect(() => {
@@ -240,7 +240,7 @@ export default function Chat({ id }) {
       })
 
       try {
-        const uploadResponse = await axios.post("https://chat-backend-production-b501.up.railway.app/api/upload", formData, {
+        const uploadResponse = await axios.post("https://chat-backend-production-b501.up.railwa.app//api/upload", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -423,6 +423,23 @@ export default function Chat({ id }) {
     }
   }
 
+  // Add a function to manually refresh last seen status
+  const refreshLastSeen = async () => {
+    if (!chatid) return
+
+    try {
+      const response = await axios.get(`https://chat-backend-production-b501.up.railway.app/api/user/last-seen/${chatid}`)
+      if (response.data && response.data.lastSeen) {
+        setLastSeen((prev) => ({
+          ...prev,
+          [chatid]: response.data.lastSeen,
+        }))
+      }
+    } catch (err) {
+      console.error("Error refreshing last seen status:", err)
+    }
+  }
+
   useEffect(() => {
     if (!currentUser || !chatid) return
 
@@ -534,6 +551,71 @@ export default function Chat({ id }) {
     fetchChatUsers()
   }, [currentUser])
 
+  // Add this useEffect to fetch last seen times when the component mounts
+  useEffect(() => {
+    if (!currentUser) return
+
+    // Listen for initial last seen times
+    socket.on("last seen times", (times) => {
+      setLastSeen(times)
+    })
+
+    // Set up a periodic refresh of last seen status
+    const lastSeenInterval = setInterval(() => {
+      if (chatid) {
+        // Fetch last seen time for the current chat user
+        axios
+          .get(`https://chat-backend-production-b501.up.railway.app/api/user/last-seen/${chatid}`)
+          .then((response) => {
+            if (response.data && response.data.lastSeen) {
+              setLastSeen((prev) => ({
+                ...prev,
+                [chatid]: response.data.lastSeen,
+              }))
+            }
+          })
+          .catch((err) => console.error("Error fetching last seen:", err))
+      }
+    }, 60000) // Refresh every minute
+
+    return () => {
+      socket.off("last seen times")
+      clearInterval(lastSeenInterval)
+    }
+  }, [currentUser, chatid])
+
+  // Update last seen when component unmounts
+  useEffect(() => {
+    return () => {
+      if (currentUser) {
+        // Notify server that user is disconnecting
+        socket.emit("disconnectsingleuser", currentUser.id)
+      }
+    }
+  }, [currentUser])
+
+  // Handle page refresh or close
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (currentUser) {
+        // Use a synchronous approach for beforeunload
+        const xhr = new XMLHttpRequest()
+        xhr.open("POST", `https://chat-backend-production-b501.up.railway.app/api/user/update-last-seen/${currentUser.id}`, false)
+        xhr.setRequestHeader("Content-Type", "application/json")
+        xhr.send(JSON.stringify({ timestamp: new Date().toISOString() }))
+
+        // Also notify via socket if possible
+        socket.emit("disconnectsingleuser", currentUser.id)
+      }
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload)
+    }
+  }, [currentUser])
+
   // Add code to reset unread messages when changing chats in the handleUserClick function:
   const handleUserClick = (userId) => {
     setChatId(userId)
@@ -583,6 +665,12 @@ export default function Chat({ id }) {
 
     try {
       const lastSeenDate = new Date(timestamp)
+
+      // Check if date is valid
+      if (isNaN(lastSeenDate.getTime())) {
+        return "Last seen: Unknown"
+      }
+
       const now = new Date()
       const diffMs = now - lastSeenDate
       const diffMins = Math.floor(diffMs / 60000)
@@ -1007,8 +1095,14 @@ export default function Chat({ id }) {
                         {onlineUsers[activeChatUser] ? (
                           <span className="text-xs px-2 py-0.5 bg-green-100 text-green-800 rounded-full">online</span>
                         ) : (
-                          <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full">
+                          <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-800 rounded-full flex items-center gap-1">
                             {lastSeen[activeChatUser] ? formatLastSeen(lastSeen[activeChatUser]) : "offline"}
+                            <button
+                              onClick={refreshLastSeen}
+                              className="text-gray-500 hover:text-gray-700"
+                              title="Refresh last seen status"
+                            >
+                            </button>
                           </span>
                         )}
                       </div>
@@ -1536,7 +1630,7 @@ export default function Chat({ id }) {
                 </svg>
               </button>
 
-          <button
+              <button
                 type="submit"
                 disabled={isSending}
                 className="px-5 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-full hover:from-purple-600 hover:to-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 shadow-md flex items-center justify-center"

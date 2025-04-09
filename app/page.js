@@ -6,7 +6,7 @@ import ProtectedRoute from "./components/ProtectedRoute"
 import { useAuth } from "./context/AuthContext"
 import io from "socket.io-client"
 import { LogOut } from 'lucide-react';
-const socket = io("http://localhost:8000")
+const socket = io("https://chat-backend-production-b501.up.railway.app")
 export default function UserList() {
   const [users, setUsers] = useState([])
   const [selectedUser, setSelectedUser] = useState(null)

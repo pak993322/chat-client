@@ -37,6 +37,8 @@ export default function Chat({ id }) {
   const audioInputRef = useRef(null)
   let typingTimeout
   const [slectfile, setSelectFile] = useState(false)
+  // Add xs breakpoint for very small mobile devices
+  const xs = "480px"
   // Add a new state variable for tracking unread messages at the top with other state declarations:
   const [unreadMessages, setUnreadMessages] = useState({})
   // Add these new state variables at the top with the other state declarations
@@ -798,8 +800,8 @@ export default function Chat({ id }) {
   const renderAudioMessage = (url, idx, msg) => {
     return (
       <div className="audio-player w-full">
-        <audio src={url} controls className="w-full max-w-[250px] h-10" preload="metadata" />
-        <div className="text-xs opacity-75 mt-1 text-right">
+        <audio src={url} controls className="w-full max-w-[200px] sm:max-w-[250px] h-8 sm:h-10" preload="metadata" />
+        <div className="text-[10px] sm:text-xs opacity-75 mt-1 text-right">
           {formatMessageTime(msg.timestamp)}
           {renderSeenStatus(msg)}
         </div>
@@ -896,9 +898,9 @@ export default function Chat({ id }) {
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+          className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
         >
-          <div className="flex-shrink-0 w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+          <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 rounded-lg flex items-center justify-center">
             {icon === "file-pdf" && (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -965,11 +967,11 @@ export default function Chat({ id }) {
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">{filename}</p>
-            <p className="text-xs text-gray-500">Click to open</p>
+            <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">{filename}</p>
+            <p className="text-[10px] sm:text-xs text-gray-500">Click to open</p>
           </div>
         </a>
-        <div className="text-xs opacity-75 mt-1 text-right">
+        <div className="text-[10px] sm:text-xs opacity-75 mt-1 text-right">
           {formatMessageTime(msg.timestamp)}
           {renderSeenStatus(msg)}
         </div>
@@ -981,12 +983,15 @@ export default function Chat({ id }) {
     <ProtectedRoute>
       <div className="flex flex-col h-screen w-full mx-auto bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-600 to-violet-500 text-white p-3 flex items-center justify-between shadow-md">
-          <div className="flex items-center gap-2">
-            <button onClick={toggleSidebar} className="md:hidden p-2 rounded-full hover:bg-white/20 transition-colors">
+        <div className="bg-gradient-to-r from-purple-600 to-violet-500 text-white p-2 sm:p-3 flex items-center justify-between shadow-md">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <button
+              onClick={toggleSidebar}
+              className="md:hidden p-1.5 sm:p-2 rounded-full hover:bg-white/20 transition-colors"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className="h-4 w-4 sm:h-5 sm:w-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -1004,11 +1009,11 @@ export default function Chat({ id }) {
                 }
               }}
             >
-              <ArrowLeftFromLine className="h-4 w-4" />
-              <h1 className="text-base font-bold">Back</h1>
+              <ArrowLeftFromLine className="h-3 w-3 sm:h-4 sm:w-4" />
+              <h1 className="text-sm sm:text-base font-bold">Back</h1>
             </div>
           </div>
-          <div className="text-xs opacity-90 truncate max-w-[150px]">
+          <div className="text-xs opacity-90 truncate max-w-[100px] sm:max-w-[150px]">
             {currentUser?.username ? `${currentUser.username}` : "Not logged in"}
           </div>
         </div>
@@ -1018,7 +1023,7 @@ export default function Chat({ id }) {
           <div
             className={`${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
             md:translate-x-0 transition-transform duration-300 absolute md:relative z-10 md:z-0
-            w-3/4 sm:w-1/2 md:w-1/3 lg:w-1/4 h-[calc(100%-3.5rem)] bg-white border-r border-gray-200 
+            w-[85%] xs:w-3/4 sm:w-1/2 md:w-1/3 lg:w-1/4 h-[calc(100%-3.5rem)] bg-white border-r border-gray-200 
             flex flex-col shadow-lg md:shadow-none`}
           >
             <div className="p-3 border-b border-gray-200 bg-gray-50">
@@ -1080,40 +1085,42 @@ export default function Chat({ id }) {
           {/* Chat area */}
           <div className="flex flex-col flex-1 bg-gray-50">
             {/* Chat header */}
-            <div className="p-3 border-b border-gray-200 bg-white shadow-sm flex items-center gap-2 justify-between">
-              <div className="flex items-center gap-2">
+            <div className="p-2 sm:p-3 border-b border-gray-200 bg-white shadow-sm flex items-center gap-2 justify-between">
+              <div className="flex items-center gap-1 sm:gap-2">
                 {activeChatUser && (
                   <>
                     <div className="relative">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold">
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold">
                         {activeUserName?.charAt(0).toUpperCase() || "?"}
                       </div>
                       {onlineUsers[activeChatUser] && (
-                        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
+                        <div className="absolute -bottom-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full border-2 border-white"></div>
                       )}
                     </div>
                     <div className="min-w-0">
-                      <div className="font-medium text-gray-800 text-sm flex items-center gap-1 truncate">
+                      <div className="font-medium text-gray-800 text-xs sm:text-sm flex items-center gap-1 truncate">
                         {activeUserName}
                         {onlineUsers[activeChatUser] ? (
-                          <span className="text-xs px-1.5 py-0.5 bg-green-100 text-green-800 rounded-full">online</span>
+                          <span className="text-[10px] sm:text-xs px-1 py-0.5 bg-green-100 text-green-800 rounded-full">
+                            online
+                          </span>
                         ) : (
-                          <span className="text-xs px-1.5 py-0.5 bg-gray-100 text-gray-800 rounded-full truncate max-w-[120px]">
+                          <span className="text-[10px] sm:text-xs px-1 py-0.5 bg-gray-100 text-gray-800 rounded-full truncate max-w-[80px] sm:max-w-[120px]">
                             {lastSeen[activeChatUser] ? formatLastSeen(lastSeen[activeChatUser]) : "offline"}
                           </span>
                         )}
                       </div>
-                      {typingStatus && <div className="text-xs text-purple-500">typing...</div>}
+                      {typingStatus && <div className="text-[10px] sm:text-xs text-purple-500">typing...</div>}
                     </div>
                   </>
                 )}
               </div>
               <button
                 onClick={refreshMessages}
-                className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
+                className="p-1 sm:p-1.5 rounded-full hover:bg-gray-100 transition-colors"
                 aria-label="Refresh messages"
               >
-                <RefreshCw className="h-4 w-4 text-gray-600" />
+                <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600" />
               </button>
             </div>
 
@@ -1158,16 +1165,18 @@ export default function Chat({ id }) {
                                 className={`flex ${msg.sender?._id === currentUser?.id ? "justify-end" : "justify-start"}`}
                               >
                                 <div
-                                  className={`px-3 py-2 rounded-2xl max-w-[85%] shadow-sm
+                                  className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-2xl max-w-[90%] sm:max-w-[85%] shadow-sm
                                   ${
                                     msg.sender?._id === currentUser?.id
                                       ? "bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-br-none"
                                       : "bg-white text-gray-800 rounded-bl-none border border-gray-100"
                                   }`}
                                 >
-                                  <div className="font-semibold text-xs opacity-75 mb-0.5">{msg.sender?.username}</div>
-                                  <div className="break-words text-sm">{msg.content}</div>
-                                  <div className="text-xs opacity-75 mt-1 text-right">
+                                  <div className="font-semibold text-[10px] sm:text-xs opacity-75 mb-0.5">
+                                    {msg.sender?.username}
+                                  </div>
+                                  <div className="break-words text-xs sm:text-sm">{msg.content}</div>
+                                  <div className="text-[10px] sm:text-xs opacity-75 mt-1 text-right">
                                     {formatMessageTime(msg.timestamp)}
                                     {renderSeenStatus(msg)}
                                   </div>
@@ -1198,14 +1207,14 @@ export default function Chat({ id }) {
                                       <img
                                         src={url || "/placeholder.svg"}
                                         alt={`Shared image ${idx + 1}`}
-                                        className="max-w-full rounded-md max-h-48 object-contain"
+                                        className="max-w-full rounded-md max-h-36 sm:max-h-48 object-contain"
                                       />
                                       <button
                                         onClick={() => downloadImage(url, getFilenameFromUrl(url))}
-                                        className="absolute bottom-2 right-2 bg-white rounded-full p-1.5 shadow-md hover:bg-gray-100 transition-colors"
+                                        className="absolute bottom-2 right-2 bg-white rounded-full p-1 sm:p-1.5 shadow-md hover:bg-gray-100 transition-colors"
                                         aria-label="Download image"
                                       >
-                                        <Download className="h-4 w-4 text-gray-700" />
+                                        <Download className="h-3 w-3 sm:h-4 sm:w-4 text-gray-700" />
                                       </button>
                                     </div>
                                     <div className="text-xs text-gray-500 mt-1 text-right">
@@ -1431,23 +1440,23 @@ export default function Chat({ id }) {
             )}
 
             {/* Message input */}
-            <form onSubmit={handleSubmit} className="p-2 border-t flex gap-2 bg-white">
+            <form onSubmit={handleSubmit} className="p-1.5 sm:p-2 border-t flex gap-1 sm:gap-2 bg-white">
               {isRecording ? (
-                <div className="flex-1 px-3 py-2 border border-red-300 rounded-full bg-red-50 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                <div className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 border border-red-300 rounded-full bg-red-50 flex items-center justify-between">
+                  <div className="flex items-center gap-1 sm:gap-2">
                     <span className="animate-pulse">
-                      <span className="inline-block w-2 h-2 bg-red-500 rounded-full"></span>
+                      <span className="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-500 rounded-full"></span>
                     </span>
-                    <span className="text-red-600 font-medium text-sm">
+                    <span className="text-red-600 font-medium text-xs sm:text-sm">
                       Recording {formatRecordingTime(recordingTime)}
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={stopRecording}
-                    className="bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition-colors"
+                    className="bg-red-500 text-white rounded-full p-1 sm:p-1.5 hover:bg-red-600 transition-colors"
                   >
-                    <X className="h-3 w-3" />
+                    <X className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                   </button>
                 </div>
               ) : (
@@ -1458,7 +1467,7 @@ export default function Chat({ id }) {
                     setMessage(e.target.value)
                     handleTyping()
                   }}
-                  className="flex-1 px-3 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-sm text-sm"
+                  className="flex-1 px-2.5 sm:px-3 py-1.5 sm:py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent shadow-sm text-xs sm:text-sm"
                   placeholder="Type a message..."
                 />
               )}
@@ -1468,16 +1477,17 @@ export default function Chat({ id }) {
                 <button
                   type="button"
                   onClick={() => setSelectFile(!slectfile)}
-                  className="p-2 bg-gray-100 rounded-full cursor-pointer hover:bg-gray-200 transition-colors flex items-center justify-center shadow-sm"
+                  className="p-1.5 sm:p-2 bg-gray-100 rounded-full cursor-pointer hover:bg-gray-200 transition-colors flex items-center justify-center shadow-sm"
                 >
-                  <Paperclip className="h-5 w-5 text-gray-600" />
+                  <Paperclip className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
                 </button>
 
-                {/* Paperclip menu */}
+                {/* Paperclip menu - update for better mobile experience */}
                 {slectfile && (
-                  <div className="absolute bottom-12 right-0 bg-white rounded-lg shadow-lg border border-gray-200 p-2 w-44 z-10 paperclip-menu">
-                    <div className="space-y-1">
-                      <label className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md cursor-pointer transition-colors">
+                  <div className="absolute bottom-12 right-0 bg-white rounded-lg shadow-lg border border-gray-200 p-1.5 sm:p-2 w-36 sm:w-44 z-10 paperclip-menu">
+                    <div className="space-y-0.5 sm:space-y-1">
+                      {/* Menu items remain the same but with adjusted padding */}
+                      <label className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 hover:bg-gray-100 rounded-md cursor-pointer transition-colors">
                         <input
                           type="file"
                           accept="image/*"
@@ -1508,7 +1518,7 @@ export default function Chat({ id }) {
                         )}
                       </label>
 
-                      <label className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md cursor-pointer transition-colors">
+                      <label className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 hover:bg-gray-100 rounded-md cursor-pointer transition-colors">
                         <input
                           type="file"
                           accept="audio/*"
@@ -1540,7 +1550,7 @@ export default function Chat({ id }) {
                       </label>
 
                       {/* Document upload option */}
-                      <label className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-md cursor-pointer transition-colors">
+                      <label className="flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 hover:bg-gray-100 rounded-md cursor-pointer transition-colors">
                         <input
                           type="file"
                           accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
@@ -1579,21 +1589,21 @@ export default function Chat({ id }) {
               <button
                 type="button"
                 onClick={isRecording ? stopRecording : startRecording}
-                className={`p-2 rounded-full flex items-center justify-center shadow-sm relative ${
+                className={`p-1.5 sm:p-2 rounded-full flex items-center justify-center shadow-sm relative ${
                   isRecording ? "bg-red-500 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
-                <Mic className="h-5 w-5" />
+                <Mic className="h-4 w-4 sm:h-5 sm:w-5" />
               </button>
 
               <button
                 type="submit"
                 disabled={isSending}
-                className="p-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-full hover:from-purple-600 hover:to-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 shadow-md flex items-center justify-center"
+                className="p-1.5 sm:p-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-full hover:from-purple-600 hover:to-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 shadow-md flex items-center justify-center"
               >
                 {isSending ? (
                   <svg
-                    className="animate-spin h-5 w-5 text-white"
+                    className="animate-spin h-4 w-4 sm:h-5 sm:w-5 text-white"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -1613,7 +1623,7 @@ export default function Chat({ id }) {
                     ></path>
                   </svg>
                 ) : (
-                  <Send className="h-5 w-5" />
+                  <Send className="h-4 w-4 sm:h-5 sm:w-5" />
                 )}
               </button>
             </form>

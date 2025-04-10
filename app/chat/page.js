@@ -18,6 +18,8 @@ import { X } from "lucide-react"
 import { Trash } from "lucide-react"
 import { Paperclip } from "lucide-react"
 import { LoaderCircle } from "lucide-react"
+import { ZoomOut,ZoomIn } from "lucide-react"
+import { Download } from "lucide-react"
 const socket = io("https://chat-backend-production-b501.up.railway.app")
 
 export default function Chat({ id }) {
@@ -38,7 +40,6 @@ export default function Chat({ id }) {
   const [onlineUsers, setOnlineUsers] = useState({})
   // Add a new state for tracking seen messages
   const [seenMessages, setSeenMessages] = useState({})
-  // Add these new state variables at the top with the other state declarations
   const [isRecording, setIsRecording] = useState(false)
   const [audioFiles, setAudioFiles] = useState([])
   const [audioPreviews, setAudioPreviews] = useState([])
@@ -49,17 +50,55 @@ export default function Chat({ id }) {
   const audioInputRef = useRef(null)
   let typingTimeout
   const [slectfile, setSelectFile] = useState(false)
-  // Add a new state variable for tracking unread messages at the top with other state declarations:
   const [unreadMessages, setUnreadMessages] = useState({})
-  // Add these new state variables at the top with the other state declarations
   const [documentFiles, setDocumentFiles] = useState([])
   const [documentPreviews, setDocumentPreviews] = useState([])
   const [isSending, setIsSending] = useState(false)
   const documentInputRef = useRef(null)
-  // Add these new state variables at the top with the other state declarations
   const [selectedMessages, setSelectedMessages] = useState([])
   const [isSelectionMode, setIsSelectionMode] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [fullViewImage, setFullViewImage] = useState(null)
+  const [scale, setScale] = useState(1)
+
+  // Function to open the full window view
+  const openFullView = (url) => {
+    setFullViewImage(url)
+    setScale(1)
+    document.body.style.overflow = "hidden"
+  }
+
+  const closeFullView = () => {
+    setFullViewImage(null)
+    document.body.style.overflow = "auto"
+  }
+
+  const zoomIn = (e) => {
+    e.stopPropagation()
+    setScale((prev) => Math.min(prev + 0.25, 3)) 
+  }
+
+  const zoomOut = (e) => {
+    e.stopPropagation()
+    setScale((prev) => Math.max(prev - 0.25, 0.5)) // Limit min zoom to 0.5x
+  }
+
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = "auto"
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape" && fullViewImage) {
+        closeFullView()
+      }
+    }
+
+    window.addEventListener("keydown", handleEsc)
+    return () => window.removeEventListener("keydown", handleEsc)
+  }, [fullViewImage])
 
   useEffect(() => {
     const user = localStorage.getItem("user")
@@ -1445,74 +1484,140 @@ export default function Chat({ id }) {
 
                             {/* Image messages - each in its own bubble */}
                             {msg.imageUrls &&
-                              msg.imageUrls.length > 0 &&
-                              msg.imageUrls.map((url, idx) => (
-                                <div
-                                  key={`${index}-img-${idx}`}
-                                  className={`flex ${msg.sender?._id === currentUser?.id ? "justify-end" : "justify-start"}`}
-                                >
-                                  <div
-                                    className={`group relative px-3 py-1.5 sm:px-4 sm:py-2 rounded-2xl max-w-[85%] sm:max-w-[80%] shadow-sm
-                                        ${
-                                          msg.sender?._id === currentUser?.id
-                                            ? "bg-white text-gray-800 border border-purple-200"
-                                            : "bg-white text-gray-800 border border-gray-200"
-                                        }`}
-                                  >
-                                    <div className="font-semibold text-xs text-gray-500 mb-0.5 sm:mb-1">
-                                      {msg.sender?.username}
-                                    </div>
-                                    <div className="image-container relative">
-                                      <img
-                                        src={url || "/placeholder.svg"}
-                                        alt={`Shared image ${idx + 1}`}
-                                        className="max-w-full rounded-md max-h-40 sm:max-h-60 object-contain"
-                                      />
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation()
-                                          downloadImage(url, getFilenameFromUrl(url))
-                                        }}
-                                        className="absolute bottom-1 sm:bottom-2 right-1 sm:right-2 bg-white rounded-full p-1 sm:p-2 shadow-md hover:bg-gray-100 transition-colors"
-                                        aria-label="Download image"
-                                      >
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-gray-700"
-                                          fill="none"
-                                          viewBox="0 0 24 24"
-                                          stroke="currentColor"
-                                        >
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                                          />
-                                        </svg>
-                                      </button>
-                                    </div>
-                                    <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1 text-right">
-                                      {formatMessageTime(msg.timestamp)}
-                                      {renderSeenStatus(msg)}
-                                    </div>
+            msg.imageUrls.length > 0 &&
+            msg.imageUrls.map((url, idx) => (
+              <div
+                key={`${index}-img-${idx}`}
+                className={`flex ${msg.sender?._id === currentUser?.id ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`group relative px-3 py-1.5 sm:px-4 sm:py-2 rounded-2xl max-w-[85%] sm:max-w-[80%] shadow-sm
+                      ${
+                        msg.sender?._id === currentUser?.id
+                          ? "bg-white text-gray-800 border border-purple-200"
+                          : "bg-white text-gray-800 border border-gray-200"
+                      }`}
+                >
+                  <div className="font-semibold text-xs text-gray-500 mb-0.5 sm:mb-1">{msg.sender?.username}</div>
+                  <div className="image-container relative">
+                    <img
+                      src={url || "/placeholder.svg"}
+                      alt={`Shared image ${idx + 1}`}
+                      className="max-w-full rounded-md max-h-40 sm:max-h-60 object-contain cursor-pointer hover:opacity-90 transition-opacity"
+                      onClick={() => openFullView(url)}
+                    />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        downloadImage(url, getFilenameFromUrl(url))
+                      }}
+                      className="absolute bottom-1 sm:bottom-2 right-1 sm:right-2 bg-white rounded-full p-1 sm:p-2 shadow-md hover:bg-gray-100 transition-colors"
+                      aria-label="Download image"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-gray-700"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1 text-right">
+                    {formatMessageTime(msg.timestamp)}
+                    {renderSeenStatus(msg)}
+                  </div>
 
-                                    {/* Delete button - only show for user's own messages */}
-                                    {msg.sender?._id === currentUser?.id && !isSelectionMode && (
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation()
-                                          deleteMessage(msg._id)
-                                        }}
-                                        className="absolute -right-1 sm:-right-2 -top-1 sm:-top-2 bg-red-500 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                                        aria-label="Delete message"
-                                      >
-                                        <X className="w-2 h-2 sm:w-3 sm:h-3" />
-                                      </button>
-                                    )}
-                                  </div>
-                                </div>
-                              ))}
+                  {/* Delete button - only show for user's own messages */}
+                  {msg.sender?._id === currentUser?.id && !isSelectionMode && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        deleteMessage(msg._id)
+                      }}
+                      className="absolute -right-1 sm:-right-2 -top-1 sm:-top-2 bg-red-500 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-label="Delete message"
+                    >
+                      <X className="w-2 h-2 sm:w-3 sm:h-3" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+
+{fullViewImage && (
+        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center" onClick={closeFullView}>
+          <div
+            className="absolute inset-0 flex items-center justify-center overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={fullViewImage || "/placeholder.svg"}
+              alt="Full view"
+              className="max-h-screen max-w-screen object-contain transition-transform duration-200"
+              style={{ transform: `scale(${scale})` }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+
+          {/* Control panel */}
+          <div className="absolute top-4 right-4 flex gap-2">
+            <button
+              onClick={closeFullView}
+              className="bg-black bg-opacity-50 text-white rounded-full p-3 hover:bg-opacity-70 transition-all"
+              aria-label="Close full view"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Zoom controls */}
+          <div className="absolute bottom-4 left-4 flex gap-2">
+            <button
+              onClick={zoomOut}
+              className="bg-black bg-opacity-50 text-white rounded-full p-3 hover:bg-opacity-70 transition-all"
+              aria-label="Zoom out"
+              disabled={scale <= 0.5}
+            >
+              <ZoomOut className="w-6 h-6" />
+            </button>
+            <button
+              onClick={zoomIn}
+              className="bg-black bg-opacity-50 text-white rounded-full p-3 hover:bg-opacity-70 transition-all"
+              aria-label="Zoom in"
+              disabled={scale >= 3}
+            >
+              <ZoomIn className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Download button */}
+          <div className="absolute bottom-4 right-4">
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                downloadImage(fullViewImage, getFilenameFromUrl(fullViewImage))
+              }}
+              className="bg-black bg-opacity-50 text-white rounded-full p-3 hover:bg-opacity-70 transition-all"
+              aria-label="Download image"
+            >
+              <Download className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Current zoom level indicator */}
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
+            {Math.round(scale * 100)}%
+          </div>
+        </div>
+      )}
 
                             {/* Audio messages */}
                             {msg.audioUrls &&
